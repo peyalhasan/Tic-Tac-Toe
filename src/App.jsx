@@ -27,7 +27,7 @@ export function Board({squares, xIsNext, onPlay}) {
     status = `Winner: ${winner} `;
   }
   else {
-    status = "Next Player" + (xIsNext ? "X" : "O")
+    status = "Next Player: " + (xIsNext ? "X" : "O")
   }
 
   function handleClick(i) {
@@ -74,13 +74,22 @@ export default function Game() {
   // for changing array value
   const [history, setHistory] = useState([Array(9).fill(null)])
   const [xIsNext, setXIsNext] = useState(true);
+  const [currentMove, setCurrentMove] = useState(0)
   
-  const currentSquares = history[history.length - 1];
+  const currentSquares = history[currentMove];
 
   function handlePlay(nextSquares){
     setXIsNext(!xIsNext);
-    setHistory([...history, nextSquares])
+    const nextHistory = [...history.slice(0, currentMove + 1), nextSquares]
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1)
   }
+
+  function jumpTo(move){
+    setCurrentMove(move)
+    setXIsNext(move % 2 === 0);
+  }
+
   const moves = history.map((squares, move) =>{
     let description;
     if(move > 0){
@@ -90,9 +99,9 @@ export default function Game() {
       description = `Go to start the game`;
     }
     return(
-      <ol>
-        <button>{description}</button>
-      </ol>
+      <li key={move}>
+        <button onClick={()=> jumpTo(move)} >{description}</button>
+      </li>
     )
   })
 
